@@ -1,4 +1,4 @@
-import { auth, createUserWithEmailAndPassword, RecaptchaVerifier, signInWithPhoneNumber } from "./firebase.js";
+import { auth, createUserWithEmailAndPassword, RecaptchaVerifier, signInWithPhoneNumber, googleProvider, signInWithPopup, GoogleAuthProvider } from "./firebase.js";
 
 // window.recaptchaVerifier = new RecaptchaVerifier(auth, 'sign-in-button', {
 //     'size': 'invisible',
@@ -8,6 +8,7 @@ import { auth, createUserWithEmailAndPassword, RecaptchaVerifier, signInWithPhon
 //        console.log("Recaptcha chalgaya")
 //     }
 // });
+
 auth.languageCode = 'en';
 
 const register = () => {
@@ -28,7 +29,8 @@ const register = () => {
             console.log("error", errorMessage);
             // Swal.fire(`${errorMessage}`);
         });
-        //sign in with Phone Number -- requires billing
+
+    //sign in with Phone Number -- requires billing
     // const phone = document.getElementById("phone");
     // window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {});
     // const appVerifier = window.recaptchaVerifier;
@@ -46,9 +48,28 @@ const register = () => {
     //     });
 }
 
+// let signInButton = document.getElementById("sign-in-button");
+// signInButton.addEventListener('click', register);
 
-let signInButton = document.getElementById("sign-in-button");
-signInButton.addEventListener('click', register);
+let googleAuthentication = () => {
+    signInWithPopup(auth, googleProvider)
+    .then((result) => {
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      const token = credential.accessToken;
+      const user = result.user;
+      console.log("Google signedin User ", user);
+     
+    }).catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      const email = error.customData.email;
+      const credential = GoogleAuthProvider.credentialFromError(error);
+      console.log("Google error ", error);
+    });
+}
+
 let registerUser = document.getElementById("registerUser");
-
 registerUser.addEventListener('click', register);
+
+let signinWithGoogle = document.getElementById("signin-with-google");
+signinWithGoogle.addEventListener('click', googleAuthentication);
